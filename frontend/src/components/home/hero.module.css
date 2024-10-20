@@ -1,0 +1,64 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+    text-align: center; 
+    padding: 1rem; 
+  }
+  
+  h1 {
+    color: var(--color3); 
+    font-size: 3rem; 
+    margin-bottom: 1rem; 
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8); 
+  }
+  
+  input {
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--color3); 
+    border-radius: 5px;
+    width: 80%; 
+    max-width: 300px;
+  }
+  
+  button {
+    background-color: var(--color3);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5em 1.5em;
+    margin: 0.5rem 0; 
+    cursor: pointer;
+    font-size: 1rem; 
+    font-weight: 700;
+    transition: background-color 0.3s; 
+  }
+  
+  button:hover {
+    background-color: var(--color4); 
+  }
+  
+  
+  .status {
+    font-size: 1rem;
+    color: var(--color2);
+    margin-top: 1rem;
+    margin-top: 700;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
