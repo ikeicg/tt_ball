@@ -1,0 +1,139 @@
+/* Loading Styles */
+.loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: var(--color1);
+  }
+  
+  .spinner {
+    border: 4px solid var(--color3);
+    border-top: 4px solid var(--color1);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+  }
+  
+  .loadingText {
+    color: var(--color4);
+    font-size: 1.2rem;
+    margin-top: 1rem;
+    font-weight: bold;
+    font-style: italic;
+  }
+  
+  /* Main container */
+  .mainContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 1rem;
+  }
+  
+  /* TopBoard Styles */
+  .topBoard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0.5rem;
+    background-color: var(--color2);
+    font-weight: bold;
+  }
+  
+  .notifications {
+    flex: 1;
+    color: white;
+  }
+  
+  .exitButton {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    border-radius: 5px;
+    font-weight: bolder;
+  }
+  
+  /* PlaySection Styles */
+  .playSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    width: 100%;
+    background-color: var(--color1);
+  }
+  
+  /* PowerTab Styles */
+  .powerTab {
+    display: flex;
+    width: 120px;
+    height: 30px;
+    margin-top: 1rem;
+    background-color: var(--color3);
+    border-radius: 5px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  /* Power Levels Styling */
+  .powerSection {
+    flex: 1;
+    transition: background-color 0.2s ease;
+  }
+  
+  .powerLevel1 {
+    background-color: rgba(100, 145, 124, 0.5); /* Light intensity */
+  }
+  
+  .powerLevel2 {
+    background-color: rgba(100, 145, 124, 0.7); /* Medium-light intensity */
+  }
+  
+  .powerLevel3 {
+    background-color: rgba(100, 145, 124, 0.85); /* Medium-high intensity */
+  }
+  
+  .powerLevel4 {
+    background-color: rgba(100, 145, 124, 1); /* Highest intensity */
+  }
+  
+  /* Hover effect for visual feedback */
+  .powerSection:hover {
+    opacity: 0.8;
+  }
+  
+  /* Canvas Styles */
+  .gameCanvas {
+    background-color: var(--color5);
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--color4);
+    border-radius: 10px;
+    cursor: pointer;
+  }
+
+  .canvasContainer{
+    width: 90%;
+    height: 75%
+  }
+  
+  /* Loading spinner animation */
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+
+  /* Canvas media query resize */
+  

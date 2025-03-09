@@ -1,4 +1,4 @@
-import { GameData } from "./definitions"
+import { MatchData } from "./definitions"
 
-export const gameDB: Array<GameData> = []
+export const gameDB: Array<MatchData> = []
 
