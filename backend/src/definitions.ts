@@ -26,6 +26,12 @@ export type MatchData = {
   };
 };
 
+export type LiveMatch = {
+  playerList: Set<string>;
+  matchStarted: boolean;
+  stateHash: string;
+};
+
 export class LobbyQueue {
   public queue: Array<ClientData> = [];
   public processing: boolean = false;

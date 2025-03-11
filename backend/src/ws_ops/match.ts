@@ -1,7 +1,7 @@
 import { Server, Socket } from "socket.io";
-import { ClientData, MatchData, GameStatus } from "../definitions";
+import { ClientData, MatchData, GameStatus, LiveMatch } from "../definitions";
 
-const LiveMatches = new Map<string, [Set<string>, boolean]>();
+const LiveMatches = new Map<string, LiveMatch>();
 const playerMatchMap = new Map<string, string>();
 const socketPlayerMap = new Map<string, string>();
 
@@ -12,10 +12,10 @@ function handlePlayerDisconnect(socket: Socket) {
   const matchId = playerMatchMap.get(playerToken);
   if (!matchId) return;
 
-  const players = LiveMatches.get(matchId);
-  if (players) {
-    players[0].delete(playerToken);
-    if (players[0].size === 0) {
+  const match = LiveMatches.get(matchId);
+  if (match) {
+    match.playerList.delete(playerToken);
+    if (match.playerList.size === 0) {
       LiveMatches.delete(matchId); // Remove match if empty
     }
   }
@@ -69,28 +69,33 @@ function matchSocketHandle(io: Server): void {
         playerMatchMap.set(playerToken, matchId);
 
         //add players to show a match is live
-        let players = LiveMatches.get(matchId);
+        let match = LiveMatches.get(matchId);
         let matchStarted = false;
+        let stateHash = "";
 
-        if (!players) {
-          players = [new Set(), matchStarted];
-          LiveMatches.set(matchId, players);
+        if (!match) {
+          match = {
+            playerList: new Set(),
+            matchStarted,
+            stateHash,
+          };
+          LiveMatches.set(matchId, match);
         }
 
-        if (!players[0].has(playerToken)) {
-          players[0].add(playerToken);
+        if (!match.playerList.has(playerToken)) {
+          match.playerList.add(playerToken);
           socket.emit("client_info", { playerToken, clientData });
 
           //incase of rejoining, request the other player to share state
-          if (players[1]) {
+          if (match.matchStarted) {
             io.to(matchId).except(socket.id).emit("share_state", {});
             return;
           }
 
-          if (players[0].size === 2) {
-            players[1] = true; //the match has kicked off
+          if (match.playerList.size === 2) {
+            match.matchStarted = true; //the match has kicked off
 
-            let playerList = Array.from(players[0]);
+            let playerList = Array.from(match.playerList);
 
             let matchState: MatchData = {
               id: matchId,
@@ -146,15 +151,35 @@ function matchSocketHandle(io: Server): void {
       io.to(matchId).emit("upgrade_state", { ...matchData, state: newState });
     });
 
-    // client intiates the scorring, server should request the critical params from the client which will be sent in another event
-    socket.on("initiate_scoring", () => {});
+    // client intiates the scoring, server should request the critical params from the client which will be sent in another event
+    socket.on("initiate_scoring", (matchId) => {
+      io.to(matchId).emit("send_moves", {});
+    });
 
-    // client sends their game param which the server sends to their opponent in the match room, which the clients use to render the scoring/animation
-    socket.on("game_param", () => {});
+    // client sends their game moves which the server sends to their opponent in the match room, which the clients use to render the scoring/animation
+    socket.on("game_moves", ({ matchId, moves }) => {
+      io.to(matchId).except(socket.id).emit("sending_moves", { moves });
+    });
 
     // the scoring / rendering is done, each client sends the resulting state which the server compares for fairness and broadcasts an update to game state&progress
     // the game over event is broadcasted if the game progress is at maximum and winner announced.
-    socket.on("render_complete", () => {});
+    socket.on("render_complete", ({ matchId, stateHash, matchData }) => {
+      let match = LiveMatches.get(matchId);
+      if (!match) return;
+
+      if (!match.stateHash) {
+        match.stateHash = stateHash;
+        return;
+      }
+
+      let fairnessCheck = match.stateHash === stateHash;
+
+      if (fairnessCheck) {
+        match.stateHash = "";
+
+        // check if the game should be over, if yes, send end_game event else update stage
+      }
+    });
 
     socket.on("disconnect", () => {
       handlePlayerDisconnect(socket);
