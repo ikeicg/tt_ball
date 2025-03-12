@@ -163,23 +163,49 @@ function matchSocketHandle(io: Server): void {
 
     // the scoring / rendering is done, each client sends the resulting state which the server compares for fairness and broadcasts an update to game state&progress
     // the game over event is broadcasted if the game progress is at maximum and winner announced.
-    socket.on("render_complete", ({ matchId, stateHash, matchData }) => {
-      let match = LiveMatches.get(matchId);
-      if (!match) return;
+    socket.on(
+      "render_complete",
+      ({
+        matchId,
+        stateHash,
+        matchData,
+      }: {
+        matchId: string;
+        stateHash: string;
+        matchData: MatchData;
+      }) => {
+        let match = LiveMatches.get(matchId);
+        if (!match) return;
 
-      if (!match.stateHash) {
-        match.stateHash = stateHash;
-        return;
+        // first client reports back
+        if (!match.stateHash) {
+          match.stateHash = stateHash;
+          return;
+        }
+
+        // second player reports back
+        let fairnessCheck = match.stateHash === stateHash;
+
+        if (fairnessCheck) {
+          match.stateHash = "";
+          let maxStage = 6;
+          let { stage } = matchData.state;
+
+          // check if the game should be over, if yes, send end_game event else update stage
+          if (stage >= maxStage) {
+            io.to(matchId).emit("end_game", {});
+            return;
+          }
+
+          stage++;
+          let newState = { ...matchData.state, stage };
+          io.to(matchId).emit("upgrade_state", {
+            ...matchData,
+            state: newState,
+          });
+        }
       }
-
-      let fairnessCheck = match.stateHash === stateHash;
-
-      if (fairnessCheck) {
-        match.stateHash = "";
-
-        // check if the game should be over, if yes, send end_game event else update stage
-      }
-    });
+    );
 
     socket.on("disconnect", () => {
       handlePlayerDisconnect(socket);

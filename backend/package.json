@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
     "start": "ts-node ./src/server.ts",
-    "devStart": "nodemon"
+    "devStart": "nodemon",
+    "start-main": "node ./dist/server.js"
   },
   "keywords": [],
   "author": "",

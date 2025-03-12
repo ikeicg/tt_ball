@@ -10,9 +10,6 @@ const socketServer = new Server(httpServer, {
   },
 });
 
-// import imitation DB
-let db = require("./db");
-
 // add web socket handles
 require("./ws_ops/match")(socketServer);
 require("./ws_ops/lobby")(socketServer);
