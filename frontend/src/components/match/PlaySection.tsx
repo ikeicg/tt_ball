@@ -5,8 +5,6 @@ const PlaySection: FC = () => {
   return (
     <>
       <Canvas />
-      // I want a power tab used by player to guage intensity of their play, it
-      is displayed only when a particular acton is made on the canvas
     </>
   );
 };

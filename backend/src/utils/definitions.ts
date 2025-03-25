@@ -16,13 +16,15 @@ export enum GameStatus {
 }
 
 export type MatchData = {
-  id: string; // Unique match identifier
-  playerList: Array<string>; // Array containing the two playertokens
-  status: GameStatus; // Enum: Determines if the gameplay is on, rendering etc.
+  id: string;
+  playerList: string[];
+  status: GameStatus;
+  currentPlayerIndex: 0 | 1;
   state: {
-    score: Record<string, number>; // Player token -> Score mapping
-    stage: number; // Tracks game progress (1-6), representing each attack/defense phase
-    role: number; // Indicates whose turn it is to act (0 = attacker, 1 = defender)
+    score: Record<string, number>;
+    stage: number;
+    half: 1 | 2;
+    action: "attack" | "defend";
   };
 };
 

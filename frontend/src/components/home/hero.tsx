@@ -1,35 +1,36 @@
-import { FC, useEffect, useState, ChangeEvent } from "react";
+import { FC, useEffect, useRef, useState, ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import io, { Socket } from "socket.io-client";
 
 import styles from "./hero.module.css";
 
+const SERVER_URL = "http://localhost:5050/lobby";
+
 const HomeHero: FC = () => {
   const [storedName, setStoredName] = useState<string | null>(
-    localStorage.getItem("client_name")
+    localStorage.getItem("stored_name")
   );
   const [matching, setMatching] = useState<boolean>(false);
-  const [socket, setSocket] = useState<Socket | null>(null);
   const navigate = useNavigate();
 
-  const clientName: string = storedName
-    ? storedName.concat(Date.now().toString().slice(-4))
-    : "anon".concat(Date.now().toString().slice(-4));
+  const lobbySocketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    //connect to lobby namespace
-    const lobbySocket = io("http://localhost:5050/lobby");
-    setSocket(lobbySocket);
+    if (!lobbySocketRef.current) {
+      const socket = io(SERVER_URL);
 
-    //lobby events
-    lobbySocket.on("start_match", ({ matchId }) => {
-      setMatching(false);
-      navigate(`/match/${matchId}`);
-    });
+      if (!socket) return;
+      lobbySocketRef.current = socket;
 
-    return () => {
-      lobbySocket.disconnect();
-    };
+      socket.on("start_match", ({ matchId }) => {
+        setMatching(false);
+        navigate(`/match/${matchId}`);
+      });
+      return () => {
+        socket.disconnect();
+        lobbySocketRef.current = null;
+      };
+    }
   }, [navigate]);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>): void {
@@ -40,7 +41,7 @@ const HomeHero: FC = () => {
 
   function handleJoinMatch(): void {
     setMatching(true);
-    socket?.emit("join_match", { name: clientName });
+    lobbySocketRef.current?.emit("join_match", { name: storedName || "anon" });
   }
 
   return (
@@ -51,7 +52,7 @@ const HomeHero: FC = () => {
         className={styles.input}
         type="text"
         placeholder="Your Player Name"
-        value={storedName ? storedName : ""}
+        value={storedName || ""}
         onChange={handleInputChange}
       />
 

@@ -1,11 +1,11 @@
 import { FC } from "react";
 import styles from "./match.module.css";
 
-const TopBoard: FC = () => {
+const TopBoard: FC<{ note: string; exit: boolean }> = ({ note, exit }) => {
   return (
     <div className={styles.topBoard}>
-      <div className={styles.notifications}> Notification / Error / Winner</div>
-      <button className={styles.exitButton}>Exit</button>
+      <div className={styles.notifications}> {note}</div>
+      {exit && <button className={styles.exitButton}>Exit</button>}
     </div>
   );
 };

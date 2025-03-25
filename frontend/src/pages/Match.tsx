@@ -6,7 +6,7 @@ const Match: FC = () => {
   const [stateLoaded, setStateLoaded] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => setStateLoaded(true), 2000); // 2 seconds
+    setTimeout(() => setStateLoaded(true), 1000); // 1 seconds
   }, []);
 
   return <>{!stateLoaded ? <Loading /> : <Main />}</>;

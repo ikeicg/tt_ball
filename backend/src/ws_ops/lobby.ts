@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { ClientData, LobbyQueue } from "../definitions";
+import { ClientData, LobbyQueue } from "../utils/definitions";
 
 function lobbySocketHandle(io: Server): void {
   const lobbyIO = io.of("/lobby");
