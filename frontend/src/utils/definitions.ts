@@ -6,7 +6,7 @@ export type MatchData = {
   state: {
     score: Record<string, number>;
     stage: number;
-    half: 1 | 2;
+    half: 0 | 1;
     action: "attack" | "defend";
   };
 };

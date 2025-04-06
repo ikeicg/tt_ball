@@ -5,7 +5,7 @@ import { GameStatus } from "./definitions";
 
 type GameStore = {
   match: MatchData | null;
-  error: string;
+  message: string;
   setMatch: (match: MatchData) => void;
   setStatus: (status: GameStatus) => void;
   toggleCurrentPlayer: () => void;
@@ -13,7 +13,7 @@ type GameStore = {
   updateStage: () => void;
   updateHalf: () => void;
   toggleAction: () => void;
-  setError: (message: string) => void;
+  setMessage: (message: string) => void;
 };
 
 const useGameStore = create<GameStore>()(
@@ -21,7 +21,7 @@ const useGameStore = create<GameStore>()(
     (set) => ({
       match: null,
 
-      error: "",
+      message: "",
 
       setMatch: (match) => set({ match }),
 
@@ -85,7 +85,7 @@ const useGameStore = create<GameStore>()(
                   ...state.match,
                   state: {
                     ...state.match.state,
-                    half: state.match.state.half === 1 ? 2 : 1,
+                    half: state.match.state.half === 0 ? 1 : 0,
                   },
                 },
               }
@@ -110,7 +110,7 @@ const useGameStore = create<GameStore>()(
             : state
         ),
 
-      setError: (message) => set({ error: message }),
+      setMessage: (message) => set({ message }),
     }),
     { name: "match-storage" }
   )

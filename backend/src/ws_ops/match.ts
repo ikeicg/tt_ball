@@ -109,11 +109,12 @@ function matchSocketHandle(io: Server): void {
               currentPlayerIndex: 0,
               state: {
                 score: playerList.reduce<Record<string, number>>((x, y) => {
+                  y = y.split("#")[1];
                   x[y] = 0;
                   return x;
                 }, {}),
                 stage: 1,
-                half: 1,
+                half: 0,
                 action: "attack",
               },
             };
