@@ -14,6 +14,7 @@ type GameStore = {
   updateHalf: () => void;
   toggleAction: () => void;
   setMessage: (message: string) => void;
+  reset: () => void;
 };
 
 const useGameStore = create<GameStore>()(
@@ -111,6 +112,8 @@ const useGameStore = create<GameStore>()(
         ),
 
       setMessage: (message) => set({ message }),
+
+      reset: () => set({ match: null, message: "" }),
     }),
     { name: "match-storage" }
   )

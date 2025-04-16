@@ -11,7 +11,7 @@ const SERVER_URL = "http://localhost:5050/match";
 
 const Main: FC = () => {
   const matchSocketRef = useRef<Socket | null>(null);
-  const { match, message, setMatch } = useGameStore();
+  const { match, message, setMatch, setMessage } = useGameStore();
   const { matchId } = useParams();
   const [notification, setNotification] = useState<string>("");
   const [scoreBoard, setScoreBoard] = useState<string>("");
@@ -19,40 +19,39 @@ const Main: FC = () => {
   const playername: string = localStorage.getItem("stored_name") || "anon";
 
   useEffect(() => {
-    if (!matchId) return;
+    if (!matchId || matchSocketRef.current || matchId == "test") return;
+    // remove "test" flag later and protect routes
 
-    if (!matchSocketRef.current) {
-      const socket = io(SERVER_URL);
+    const socket = io(SERVER_URL);
+    matchSocketRef.current = socket;
 
-      matchSocketRef.current = socket;
+    socket.emit("join_match", { name: playername, matchId });
 
-      socket.emit("join_match", { name: playername, matchId });
+    socket.on("start_match", (matchState) => {
+      console.log("Match started:", matchState);
+      setMatch(matchState);
+    });
 
-      socket.on("start_match", (matchState) => {
-        console.log(matchState);
-        setMatch(matchState);
-      });
+    socket.on("notification", (data: { msg: string }) => {
+      setMessage(data.msg);
+    });
 
-      socket.on("notification", (message: string) => {
-        setNotification(message);
-      });
-
-      return () => {
-        socket.disconnect();
-        matchSocketRef.current = null;
-      };
-    }
+    return () => {
+      socket.disconnect();
+      matchSocketRef.current = null;
+    };
   }, [matchId, playername, setMatch]);
 
   // set notifications
   useEffect(() => {
-    if (!match) return;
+    if (!match || match?.id !== matchId) return;
+
     const gameInfo = extractGameInfo(match);
     if (gameInfo) {
       setNotification(gameInfo.notification);
       setScoreBoard(gameInfo.scoreboard);
     }
-  }, [match]);
+  }, [match, matchId]);
 
   useEffect(() => {
     if (message) {

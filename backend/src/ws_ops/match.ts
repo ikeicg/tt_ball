@@ -1,4 +1,4 @@
-import { Server, Socket } from "socket.io";
+import { Server, Socket, Namespace } from "socket.io";
 import {
   ClientData,
   MatchData,
@@ -10,9 +10,11 @@ const LiveMatches = new Map<string, LiveMatch>();
 const playerMatchMap = new Map<string, string>();
 const socketPlayerMap = new Map<string, string>();
 
-function handlePlayerDisconnect(socket: Socket) {
+function handlePlayerDisconnect(socket: Socket, io: Namespace) {
   const playerToken = socketPlayerMap.get(socket.id);
   if (!playerToken) return;
+
+  const playerName = playerToken.split("#")[1];
 
   const matchId = playerMatchMap.get(playerToken);
   if (!matchId) return;
@@ -28,6 +30,11 @@ function handlePlayerDisconnect(socket: Socket) {
   // Clean up mappings
   socketPlayerMap.delete(socket.id);
   playerMatchMap.delete(playerToken);
+
+  // Alert other players
+  io.to(matchId)
+    .except(socket.id)
+    .emit("notification", { msg: `${playerName} left the match` });
 }
 
 function isMatchValid(matchId: string): boolean {
@@ -90,6 +97,11 @@ function matchSocketHandle(io: Server): void {
         if (!match.playerList.has(playerToken)) {
           match.playerList.add(playerToken);
           socket.emit("client_info", { playerToken, clientData });
+
+          matchIO
+            .to(matchId)
+            .except(socket.id)
+            .emit("notification", { msg: `${name} joined the match` });
 
           //incase of rejoining, request the other player to share state
           if (match.matchStarted) {
@@ -220,7 +232,7 @@ function matchSocketHandle(io: Server): void {
     );
 
     socket.on("disconnect", () => {
-      handlePlayerDisconnect(socket);
+      handlePlayerDisconnect(socket, matchIO);
     });
   });
 }

@@ -17,10 +17,7 @@ export function extractGameInfo(data: MatchData): GameInfo | null {
     return null;
   }
 
-  const [teamA, teamB] = Object.entries(state.score).map((x) => {
-    x[0] = x[0].split("#")[1];
-    return x;
-  });
+  const [teamA, teamB] = Object.entries(state.score) as [string, number][];
   const currentPlayer = playerList[currentPlayerIndex].split("#")[1];
 
   const actionVerb = state.action === "attack" ? "attacking" : "defending";
